@@ -1,0 +1,7 @@
+<form action="" method="POST" enctype="multipart/form-data">
+  {% csrf_token %}
+  <table class="form_table">
+    <td>{{ form.as_table }}</td>
+    <td><input class="button_" type="submit" value="submit" /></td>
+  </table>
+</form>

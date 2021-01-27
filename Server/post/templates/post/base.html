@@ -1,0 +1,74 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Post</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css" integrity="sha384-vSIIfh2YWi9wW0r9iZe7RJPrKwp6bG+s9QZMoITbCckVJqGCCRhc+ccxNcdpHuYu" crossorigin="anonymous" />
+    <link rel="stylesheet" href="{% static 'base.css'%}">
+  </head>
+  <body>
+    <div class="nav_bar">
+        <p>Pirostagram</p>
+        <a href="{% url 'post:post_create' %}">게시물 작성</a>
+    </div>
+
+    {% block content %}
+
+    {% for post in posts %}
+    <div class="post">
+        <div class="image"><img src="{{post.image.url}}" alt="img" style="width: 400px; height: 400px"/></div>
+        <div class="post_content">
+            <h3>{{post.title}}</h3>
+            <textarea rows="4" readonly="readonly">{{post.content}}</textarea>
+
+            {% comment %} 작성된 댓글 {% endcomment %}
+            <p style="text-align:center;">댓글</p>
+            <hr />
+            {% for comment in post.comment_set.all %}
+            <div class='comment_box'>
+                <p>{{comment.content}}</p>
+                <form action="{% url 'post:comment_delete' post.id comment.id %}" method ='POST'>
+                    {% csrf_token %}
+                    <input name="comment_delete" type="submit" value="X" />
+                </form>
+            </div>
+            {% endfor %}
+
+            {% comment %} 좋아요 {% endcomment %} 
+            {% if post.like_status == True %}
+            <div class='like_box'>
+                <form action="{% url 'post:like' post.id %}" method="POST">
+                {% csrf_token %}
+                <button type='submit'><i class="fas fa-heart"></i></button>
+                </form>
+                <span>이 게시물에 좋아요를 눌렀습니다.</span>
+            </div>
+
+            {% elif post.like_status == False %}
+            <div class='dislike_box'>
+                <form action="{% url 'post:like' post.id %}" method="POST">
+                {% csrf_token %}
+                <button type='submit'><i class="far fa-heart"></i></button>
+                </form>
+                <span>게시물이 좋으면 좋아요를 눌러주세요!</span>
+            </div>
+            {% endif %} 
+            
+            {% comment %} 댓글 작성 {% endcomment %}
+            <div class="register_comment">
+                <form action="{% url 'post:comment_create' post.id %}" method="POST">
+                {% csrf_token %}
+                    <input class='txt' type="text" name="comment" placeholder="댓글 달기...." style="width:395px; height:50px;" />
+                    <input class='btn' type="submit" value="게시" />
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    {% endblock %}
+
+  </body>
+</html>
